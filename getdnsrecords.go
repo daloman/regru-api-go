@@ -10,6 +10,7 @@ resp, err := http.PostForm("http://example.com/form",
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -18,38 +19,29 @@ import (
 	"os"
 )
 
-func getZones() {
-	res, err := http.Get("https://api.reg.ru/api/regru2/zone/get_resource_records")
-	if err != nil {
-		log.Fatal(err)
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	//fmt.Println(res.StatusCode)
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s", body)
+type dnsRecords struct {
+	Answer       map[string][]map[string]string `json:"answer,omitempty"`
+	Result       string                         `json:"result,omitempty"`
+	Charset      string                         `json:"charset,omitempty"`
+	Messagestore string                         `json:"messagestore,omitempty"`
+	//Result       string   `json:"answer,omitempty"`
 }
 
-func getZonesPos(apiUrl string, postData url.Values) {
+func getZonesPos(apiUrl string, postData url.Values) (body []byte) {
 	res, err := http.PostForm(apiUrl, postData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	body, err := io.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 	res.Body.Close()
-	//fmt.Println(res.StatusCode)
 	if res.StatusCode > 299 {
 		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s", body)
+	//fmt.Printf("%#v\n", body)
+	return body
 }
 
 func main() {
@@ -60,6 +52,7 @@ func main() {
 	dbname, dbname_exist := os.LookupEnv("RR_API_DBNAME")
 
 	if !username_exist {
+
 		// Print the value of the environment variable
 		fmt.Println("RR_API_USERNAME variable is empty")
 	} else if !password_exist {
@@ -67,7 +60,6 @@ func main() {
 	} else if !dbname_exist {
 		fmt.Println("RR_API_DBNAME variable is empty")
 	} else {
-		//getZones()
 		apiUrl := "https://api.reg.ru/api/regru2/zone/get_resource_records"
 		postData := url.Values{}
 
@@ -75,6 +67,13 @@ func main() {
 		postData.Add("password", password)
 		postData.Add("dname", dbname)
 		fmt.Println(postData)
-		getZonesPos(apiUrl, postData)
+		var answer dnsRecords
+		b := getZonesPos(apiUrl, postData)
+		err := json.Unmarshal([]byte(b), &answer)
+		if err != nil {
+			fmt.Printf("could not unmarshal json: %s\n", err)
+		}
+		fmt.Printf("%+v\n", answer)
+
 	}
 }
