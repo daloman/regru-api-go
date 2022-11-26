@@ -19,6 +19,15 @@ import (
 	"os"
 )
 
+type domains struct {
+	dname      string
+	result     string
+	rss        map[string]string
+	service_id string
+	servtype   string
+	soa        map[string]string
+}
+
 type dnsRecords struct {
 	Answer       map[string][]map[string]string `json:"answer,omitempty"`
 	Result       string                         `json:"result,omitempty"`
