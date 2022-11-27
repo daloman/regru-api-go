@@ -17,24 +17,104 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
-type domains struct {
-	dname      string
-	result     string
-	rss        map[string]string
-	service_id string
-	servtype   string
-	soa        map[string]string
+type rrsData struct {
+	Content string
+	Prio    int
+	Rectype string
+	State   string
+	Subname string
+}
+type domainData struct {
+	Dname      string
+	Result     string
+	Rrs        []rrsData
+	Service_id string
+	Servtype   string
+	Soa        map[string]string
+}
+type answerDomains struct {
+	Domains []domainData
 }
 
 type dnsRecords struct {
-	Answer       map[string][]map[string]string `json:"answer,omitempty"`
-	Result       string                         `json:"result,omitempty"`
-	Charset      string                         `json:"charset,omitempty"`
-	Messagestore string                         `json:"messagestore,omitempty"`
-	//Result       string   `json:"answer,omitempty"`
+	Answer       answerDomains `json:"answer,omitempty"`
+	Charset      string        `json:"charset,omitempty"`
+	Messagestore string        `json:"messagestore,omitempty"`
+	Result       string        `json:"result,omitempty"`
 }
+
+/*
+https://www.digitalocean.com/community/tutorials/how-to-use-json-in-go#parsing-json-using-a-struct
+*/
+type myJSON struct {
+	IntValue        int       `json:"intValue"`
+	BoolValue       bool      `json:"boolValue"`
+	StringValue     string    `json:"stringValue"`
+	DateValue       time.Time `json:"dateValue"`
+	ObjectValue     *myObject `json:"objectValue"`
+	NullStringValue *string   `json:"nullStringValue"`
+	NullIntValue    *int      `json:"nullIntValue"`
+}
+
+type myObject struct {
+	ArrayValue []int `json:"arrayValue"`
+}
+
+/*
+var rawData =
+{
+   "answer" : {
+      "domains" : [
+         {
+            "dname" : "77699677.xyz",
+            "result" : "success",
+            "rrs" : [
+               {
+                  "content" : "194.58.112.174",
+                  "prio" : 0,
+                  "rectype" : "A",
+                  "state" : "A",
+                  "subname" : "@"
+               },
+               {
+                  "content" : "ns1.reg.ru.",
+                  "prio" : 0,
+                  "rectype" : "NS",
+                  "state" : "A",
+                  "subname" : "@"
+               },
+               {
+                  "content" : "ns2.reg.ru.",
+                  "prio" : 1,
+                  "rectype" : "NS",
+                  "state" : "A",
+                  "subname" : "@"
+               },
+               {
+                  "content" : "194.58.112.174",
+                  "prio" : 0,
+                  "rectype" : "A",
+                  "state" : "A",
+                  "subname" : "www"
+               }
+            ],
+            "service_id" : "77843261",
+            "servtype" : "domain",
+            "soa" : {
+               "minimum_ttl" : "3h",
+               "ttl" : "1d"
+            }
+         }
+      ]
+   },
+   "charset" : "utf-8",
+   "messagestore" : null,
+   "result" : "success"
+}
+*/
 
 func getZonesPos(apiUrl string, postData url.Values) (body []byte) {
 	res, err := http.PostForm(apiUrl, postData)
@@ -49,7 +129,7 @@ func getZonesPos(apiUrl string, postData url.Values) (body []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Printf("%#v\n", body)
+	//fmt.Printf("%#v\n", res)
 	return body
 }
 
@@ -75,14 +155,16 @@ func main() {
 		postData.Add("username", username)
 		postData.Add("password", password)
 		postData.Add("dname", dbname)
-		fmt.Println(postData)
+		//fmt.Println(postData)
 		var answer dnsRecords
 		b := getZonesPos(apiUrl, postData)
 		err := json.Unmarshal([]byte(b), &answer)
 		if err != nil {
 			fmt.Printf("could not unmarshal json: %s\n", err)
 		}
+		//fmt.Printf("%+v\n", answer.Answer.Domains[0].Dname)
 		fmt.Printf("%+v\n", answer)
 
 	}
+
 }
