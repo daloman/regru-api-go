@@ -17,8 +17,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"time"
 )
+
+var apiUrl = "https://api.reg.ru/api/regru2/"
+var apiFunc string
+var postData = url.Values{}
+var postFields map[string]string
 
 type rrsData struct {
 	Content string
@@ -49,75 +53,12 @@ type dnsRecords struct {
 /*
 https://www.digitalocean.com/community/tutorials/how-to-use-json-in-go#parsing-json-using-a-struct
 */
-type myJSON struct {
-	IntValue        int       `json:"intValue"`
-	BoolValue       bool      `json:"boolValue"`
-	StringValue     string    `json:"stringValue"`
-	DateValue       time.Time `json:"dateValue"`
-	ObjectValue     *myObject `json:"objectValue"`
-	NullStringValue *string   `json:"nullStringValue"`
-	NullIntValue    *int      `json:"nullIntValue"`
-}
 
-type myObject struct {
-	ArrayValue []int `json:"arrayValue"`
-}
-
-/*
-var rawData =
-{
-   "answer" : {
-      "domains" : [
-         {
-            "dname" : "77699677.xyz",
-            "result" : "success",
-            "rrs" : [
-               {
-                  "content" : "194.58.112.174",
-                  "prio" : 0,
-                  "rectype" : "A",
-                  "state" : "A",
-                  "subname" : "@"
-               },
-               {
-                  "content" : "ns1.reg.ru.",
-                  "prio" : 0,
-                  "rectype" : "NS",
-                  "state" : "A",
-                  "subname" : "@"
-               },
-               {
-                  "content" : "ns2.reg.ru.",
-                  "prio" : 1,
-                  "rectype" : "NS",
-                  "state" : "A",
-                  "subname" : "@"
-               },
-               {
-                  "content" : "194.58.112.174",
-                  "prio" : 0,
-                  "rectype" : "A",
-                  "state" : "A",
-                  "subname" : "www"
-               }
-            ],
-            "service_id" : "77843261",
-            "servtype" : "domain",
-            "soa" : {
-               "minimum_ttl" : "3h",
-               "ttl" : "1d"
-            }
-         }
-      ]
-   },
-   "charset" : "utf-8",
-   "messagestore" : null,
-   "result" : "success"
-}
-*/
-
-func getZonesPos(apiUrl string, postData url.Values) (body []byte) {
-	res, err := http.PostForm(apiUrl, postData)
+func apiPost(reqUrl string, postFields map[string]string) (body []byte) {
+	for k, v := range postFields {
+		postData.Add(k, v)
+	}
+	res, err := http.PostForm(reqUrl, postData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -138,7 +79,7 @@ func main() {
 	// Get environment variables
 	username, username_exist := os.LookupEnv("RR_API_USERNAME")
 	password, password_exist := os.LookupEnv("RR_API_PASSWORD")
-	dbname, dbname_exist := os.LookupEnv("RR_API_DBNAME")
+	domainName, domain_name_exist := os.LookupEnv("RR_API_DOMAIN_NAME")
 
 	if !username_exist {
 
@@ -146,25 +87,46 @@ func main() {
 		fmt.Println("RR_API_USERNAME variable is empty")
 	} else if !password_exist {
 		fmt.Println("RR_API_PASSWORD variable is empty")
-	} else if !dbname_exist {
-		fmt.Println("RR_API_DBNAME variable is empty")
+	} else if !domain_name_exist {
+		fmt.Println("RR_API_DOMAIN_NAME variable is empty")
 	} else {
-		apiUrl := "https://api.reg.ru/api/regru2/zone/get_resource_records"
-		postData := url.Values{}
+		//https://api.reg.ru/api/regru2/<имя_категории_функции>/<имя_функции>[?<HTTP_параметры_для_запросов_GET>]
 
-		postData.Add("username", username)
-		postData.Add("password", password)
-		postData.Add("dname", dbname)
-		//fmt.Println(postData)
+		apiFunc = "zone/get_resource_records"
+
+		/* API functions
+		zone/get_resource_records
+		zone/add_txt
+		zone/remove_record
+		*/
+		postFields = make(map[string]string)
+		postFields["username"] = username
+		postFields["password"] = password
+		postFields["domain_name"] = domainName
+
+		// Now get resource records
+		reqUrl := apiUrl + apiFunc
 		var answer dnsRecords
-		b := getZonesPos(apiUrl, postData)
-		err := json.Unmarshal([]byte(b), &answer)
+		b := apiPost(reqUrl, postFields)
+		err := json.Unmarshal(b, &answer)
 		if err != nil {
 			fmt.Printf("could not unmarshal json: %s\n", err)
 		}
-		//fmt.Printf("%+v\n", answer.Answer.Domains[0].Dname)
 		fmt.Printf("%+v\n", answer)
+		//fmt.Printf("%+v\n", answer.Answer.Domains[0].Rrs[0].Content)
 
+		/*
+			// Now create TXT resource record
+			apiFunc = "zone/add_txt"
+			reqUrl = apiUrl + apiFunc
+			subdomain := "ghm"
+			text_record := "foo"
+			postData.Add("subdomain", subdomain)
+			postData.Add("text", text_record)
+			b = getZonesPos(reqUrl, postData)
+			fmt.Println(string(b))
+
+		*/
 	}
 
 }
