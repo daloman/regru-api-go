@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/daloman/regru-api-go/pkg/zonecontrol"
 )
@@ -15,6 +14,7 @@ const zoneRemoveRrs = "zone/remove_record"
 
 var username, password, domainName string
 
+/*
 func main() {
 
 	// Get environment variables
@@ -43,6 +43,7 @@ func main() {
 		//rmTxtRr(username, password, domainName, "_acme_oops", "TXT")
 	}
 }
+*/
 
 func GetZones(username, password, domainName string) {
 	// Now get resource records
