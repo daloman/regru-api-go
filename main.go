@@ -1,5 +1,12 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"regru-api-go/pkg/zonecontrol"
+)
+
 const apiUrl = "https://api.reg.ru/api/regru2/"
 const zoneGetRrs = "zone/get_resource_records"
 const zoneAddTxt = "zone/add_txt"
@@ -7,7 +14,6 @@ const zoneRemoveRrs = "zone/remove_record"
 
 var username, password, domainName string
 
-/*
 func main() {
 
 	// Get environment variables
@@ -101,4 +107,3 @@ func RmTxtRr(username, password, domainName, subdomain, resourceRecordType strin
 	}
 	fmt.Printf("The answer is: %+v\n", b)
 }
-*/
