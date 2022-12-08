@@ -4,7 +4,8 @@ import (
 	"io"
 	"log"
 	"net/url"
-	"regru-api-go/pkg/client"
+
+	"github.com/daloman/regru-api-go/pkg/client"
 )
 
 var apiFunc string

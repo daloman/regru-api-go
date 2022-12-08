@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"regru-api-go/pkg/zonecontrol"
+
+	"github.com/daloman/regru-api-go/pkg/zonecontrol"
 )
 
 const apiUrl = "https://api.reg.ru/api/regru2/"
