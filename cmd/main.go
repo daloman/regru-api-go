@@ -36,13 +36,11 @@ func main() {
 		getZones(username, password, domainName)
 
 		// Add TXT record example:
-		addTxtRr(username, password, domainName, "_acme_oops_002.77699677.xyz.", "_acme_oops_body_002")
+		//addTxtRr(username, password, domainName, "_acme_oops_002.77699677.xyz.", "_acme_oops_body_002")
 		//
 		// Remove TXT resource record example
 		//rmTxtRr(username, password, domainName, "_acme_oops", "TXT")
-
 	}
-
 }
 
 func getZones(username, password, domainName string) {
@@ -56,16 +54,12 @@ func getZones(username, password, domainName string) {
 	postFields["domain_name"] = domainName
 
 	answer := zonecontrol.ApiRequest(reqUrl, postFields)
-	// Print "raw" default api request in json format
-	//fmt.Println(string(answer))
 	b := zonecontrol.Response{}
 	err := json.Unmarshal(answer, &b)
 	if err != nil {
 		fmt.Printf("could not unmarshal json: %s\n", err)
 	}
 	fmt.Printf("The answer is: %+v\n", b)
-	//fmt.Printf("%+v\n", answer.Answer.Domains[0].Rrs[0].Content)
-
 }
 
 func addTxtRr(username, password, domainName, subdomain, textBody string) {
@@ -89,11 +83,9 @@ func addTxtRr(username, password, domainName, subdomain, textBody string) {
 		fmt.Printf("could not unmarshal json: %s\n", err)
 	}
 	fmt.Printf("The answer is: %+v\n", b)
-	//fmt.Printf("%+v\n", answer.Answer.Domains[0].Rrs[0].Content)
 }
 
 func rmTxtRr(username, password, domainName, subdomain, resourceRecordType string) {
-	// Now get resource records
 	apiFunc := zoneRemoveRrs
 	reqUrl := apiUrl + apiFunc
 
@@ -113,5 +105,4 @@ func rmTxtRr(username, password, domainName, subdomain, resourceRecordType strin
 		fmt.Printf("could not unmarshal json: %s\n", err)
 	}
 	fmt.Printf("The answer is: %+v\n", b)
-	//fmt.Printf("%+v\n", answer.Answer.Domains[0].Rrs[0].Content)
 }
