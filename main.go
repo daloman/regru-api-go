@@ -1,4 +1,4 @@
-package main
+package regruapigo
 
 import (
 	"encoding/json"
