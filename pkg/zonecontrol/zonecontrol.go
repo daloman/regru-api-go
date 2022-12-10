@@ -5,49 +5,11 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/daloman/regru-api-go/pkg/client"
+	"github.com/daloman/regru-api-go/pkg/connector"
 )
 
-var apiFunc string
-var postFields map[string]string
-
-type rrsData struct {
-	Content string
-	Prio    int
-	Rectype string
-	State   string
-	Subname string
-}
-type domainData struct {
-	Dname        string
-	Error_code   string
-	Error_text   string
-	Error_params map[string]string
-	Result       string
-	Rrs          []rrsData
-	Service_id   string
-	Servtype     string
-	Soa          map[string]string
-}
-type answerDomains struct {
-	Domains []domainData
-}
-
-type dnsRecords struct {
-	Answer       answerDomains     `json:"answer,omitempty"`
-	Charset      string            `json:"charset,omitempty"`
-	Messagestore string            `json:"messagestore,omitempty"`
-	Result       string            `json:"result,omitempty"`
-	Error_code   string            `json:"error_code,omitempty"`
-	Error_text   string            `json:"error_text,omitempty"`
-	Error_params map[string]string `json:"error_params,omitempty"`
-}
-
-const apiUrl = "https://api.reg.ru/api/regru2/"
-const zoneGetRrs = "zone/get_resource_records"
-const zoneAddTxt = "zone/add_txt"
-
-type Response dnsRecords
+//var apiFunc string
+//var postFields map[string]string
 
 //Make any POST request with default API settings and return bytes
 func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
@@ -55,8 +17,8 @@ func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
 	for k, v := range postFields {
 		postData.Add(k, v)
 	}
-
-	c := client.NewClient()
+	// Take request over connector (may inclde proxy, tmeout settings and so on...)
+	c := connector.NewConnection()
 	res, err := c.PostForm(reqUrl, postData)
 	if err != nil {
 		log.Fatal(err.Error())
