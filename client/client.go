@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/daloman/regru-api-go/pkg/zonecontrol"
+	"../zonecontrol"
 )
 
 type rrsData struct {
