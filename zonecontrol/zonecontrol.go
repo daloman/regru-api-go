@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/url"
 
-	"../connector"
+	"github.com/daloman/regru-api-go/connector"
 )
 
 //var apiFunc string
