@@ -9,17 +9,17 @@ import (
 	"github.com/daloman/regru-api-go/connector"
 )
 
-// Make any POST request with default API settings and return bytes
+// ApiRequest make any POST request with default API settings and return response body.
 func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
 	postData := url.Values{}
 	for k, v := range postFields {
 		postData.Add(k, v)
 	}
-	// Take request over connector (may inclde proxy, tmeout settings and so on...)
+
 	c := connector.NewConnection()
 	res, err := c.PostForm(reqUrl, postData)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Connection error: %v", err)
 
 		return
 	}

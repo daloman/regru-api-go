@@ -47,8 +47,8 @@ const zoneGetRrs = "zone/get_resource_records"
 const zoneAddTxt = "zone/add_txt"
 const zoneRemoveRrs = "zone/remove_record"
 
+// GetZones return resource records for domain.
 func GetZones(username, password, domainName string) {
-	// Now get resource records
 	apiFunc := zoneGetRrs
 	reqUrl := apiUrl + apiFunc
 	// Create data map for POST request
@@ -61,8 +61,8 @@ func GetZones(username, password, domainName string) {
 	unmarshalRsponse(answer)
 }
 
+// AddTxtRr add TXT resource record for domain.
 func AddTxtRr(username, password, domainName, subdomain, textBody string) {
-	// Now get resource records
 	apiFunc := zoneAddTxt
 	reqUrl := apiUrl + apiFunc
 
@@ -77,6 +77,7 @@ func AddTxtRr(username, password, domainName, subdomain, textBody string) {
 	unmarshalRsponse(answer)
 }
 
+// RmTxtRr remove TXT resource record for domain.
 func RmTxtRr(username, password, domainName, subdomain, resourceRecordType string) {
 	apiFunc := zoneRemoveRrs
 	reqUrl := apiUrl + apiFunc
@@ -92,6 +93,7 @@ func RmTxtRr(username, password, domainName, subdomain, resourceRecordType strin
 	unmarshalRsponse(answer)
 }
 
+// unmarshalRsponse returns API answer as JSON structure.
 func unmarshalRsponse(rawData []byte) {
 	b := response{}
 	err := json.Unmarshal(rawData, &b)
