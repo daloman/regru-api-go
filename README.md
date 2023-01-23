@@ -18,7 +18,7 @@ API documentation https://www.reg.ru/reseller/api2doc#common
 }
 ```
 # Known Issues
-Test API returns some fields as strings for test access and as int for real data, and naoborot
+Test API returns some fields as strings for test access and as int for real data, and vice versa.
 
 Response for real account:
 ```json
