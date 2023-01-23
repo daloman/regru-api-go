@@ -2,14 +2,12 @@ package client
 
 import (
 	"io"
-	"log"
 	"net/url"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/daloman/regru-api-go/connector"
 )
-
-//var apiFunc string
-//var postFields map[string]string
 
 // Make any POST request with default API settings and return bytes
 func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
@@ -21,16 +19,18 @@ func ApiRequest(reqUrl string, postFields map[string]string) (body []byte) {
 	c := connector.NewConnection()
 	res, err := c.PostForm(reqUrl, postData)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Error(err)
+
+		return
 	}
+	defer res.Body.Close()
+
 	body, err = io.ReadAll(res.Body)
-	res.Body.Close()
 	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		log.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
-	//fmt.Printf("%#v\n", res)
 	return body
 }

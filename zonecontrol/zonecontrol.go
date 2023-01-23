@@ -2,7 +2,9 @@ package zonecontrol
 
 import (
 	"encoding/json"
-	"fmt"
+
+	log "github.com/sirupsen/logrus"
+
 	"github.com/daloman/regru-api-go/client"
 )
 
@@ -14,15 +16,15 @@ type rrsData struct {
 	Subname string
 }
 type domainData struct {
-	Dname        string
-	Error_code   string
-	Error_text   string
-	Error_params map[string]string
-	Result       string
-	Rrs          []rrsData
-	Service_id   string
-	Servtype     string
-	Soa          map[string]string
+	Dname       string
+	ErrorCode   string
+	ErrorText   string
+	ErrorParams map[string]string
+	Result      string
+	Rrs         []rrsData
+	ServiceId   string
+	Servtype    string
+	Soa         map[string]string
 }
 type answerDomains struct {
 	Domains []domainData
@@ -33,9 +35,9 @@ type dnsRecords struct {
 	Charset      string            `json:"charset,omitempty"`
 	Messagestore string            `json:"messagestore,omitempty"`
 	Result       string            `json:"result,omitempty"`
-	Error_code   string            `json:"error_code,omitempty"`
-	Error_text   string            `json:"error_text,omitempty"`
-	Error_params map[string]string `json:"error_params,omitempty"`
+	ErrorCode    string            `json:"error_code,omitempty"`
+	ErrorText    string            `json:"error_text,omitempty"`
+	ErrorParams  map[string]string `json:"error_params,omitempty"`
 }
 
 type response dnsRecords
@@ -44,8 +46,6 @@ const apiUrl = "https://api.reg.ru/api/regru2/"
 const zoneGetRrs = "zone/get_resource_records"
 const zoneAddTxt = "zone/add_txt"
 const zoneRemoveRrs = "zone/remove_record"
-
-//var username, password, domainName string
 
 func GetZones(username, password, domainName string) {
 	// Now get resource records
@@ -93,12 +93,10 @@ func RmTxtRr(username, password, domainName, subdomain, resourceRecordType strin
 }
 
 func unmarshalRsponse(rawData []byte) {
-	// Print "raw" default api request in json format
-	//fmt.Println(string(answer))
 	b := response{}
 	err := json.Unmarshal(rawData, &b)
 	if err != nil {
-		fmt.Printf("Could not unmarshal json: %s\n", err)
+		log.Warnf("Could not unmarshal json: %s\n", err)
 	}
-	fmt.Printf("The answer is: %+v\n", b)
+	log.Printf("The answer is: %+v\n", b)
 }
