@@ -78,7 +78,7 @@ func AddTxtRr(username, password, domainName, subdomain, textBody string) {
 }
 
 // RmTxtRr remove TXT resource record for domain.
-func RmTxtRr(username, password, domainName, subdomain, resourceRecordType string) {
+func RmTxtRr(username, password, domainName, subdomain, resourceRecordType, content string) {
 	apiFunc := zoneRemoveRrs
 	reqUrl := apiUrl + apiFunc
 
@@ -88,6 +88,9 @@ func RmTxtRr(username, password, domainName, subdomain, resourceRecordType strin
 	postFields["domain_name"] = domainName
 	postFields["subdomain"] = subdomain
 	postFields["record_type"] = resourceRecordType
+	if content != "" {
+		postFields["content"] = content
+	}
 
 	answer := client.ApiRequest(reqUrl, postFields)
 	unmarshalRsponse(answer)
