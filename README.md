@@ -1,10 +1,19 @@
-# REG.RU API examples
+# regru-api-go module for Reg.ru API v2
+
+https://www.reg.ru provide API access to control users, billing, domains etc.
+
+Currently only several zone (domain) control functions implemented in this module.
+```bash
+"zone/get_resource_records"
+"zone/add_txt"
+"zone/remove_record"
+```
+API documentation https://www.reg.ru/reseller/api2doc#common
+
+# Access from known IP-address only
 
 Access configuration https://www.reg.ru/user/account/#/settings/api/
 
-API documentation https://www.reg.ru/reseller/api2doc#common
-
-# Access from known IP-address
 ```json
 {
    "charset" : "utf-8",
@@ -17,6 +26,36 @@ API documentation https://www.reg.ru/reseller/api2doc#common
    "result" : "error"
 }
 ```
+
+## Examples
+
+```go
+// Get domain information
+package main
+
+import (
+	"os"
+	"github.com/daloman/regru-api-go/zonecontrol"
+)
+
+var username, password, domainName string
+
+func main() {
+
+	username = os.Getenv("API_USERNAME")
+	password = os.Getenv("API_PASSWORD")
+	domainName = "mydomain.com"
+	
+   zonecontrol.GetZones(username, password, domainName)
+   
+   // Create TXT resource record
+   //zonecontrol.AddTxtRr(username, password, domainName, "_acme_foo_bar", "txt-record-content")
+   // Remove TXT resource record
+	//zonecontrol.RmTxtRr(username, password, domainName, "_acme_example", "TXT", "")
+}
+
+```
+
 # Known Issues
 Test API returns some fields as strings for test access and as int for real data, and vice versa.
 
@@ -26,18 +65,18 @@ Response for real account:
    "answer" : {
       "domains" : [
          {
-            "dname" : "77699677.xyz",
+            "dname" : "example.xyz",
             "result" : "success",
             "rrs" : [
                {
-                  "content" : "194.58.112.174",
+                  "content" : "111.222.111.222",
                   "prio" : 0,
                   "rectype" : "A",
                   "state" : "A",
                   "subname" : "@"
                },
             ],
-            "service_id" : "77843261",
+            "service_id" : "12345678",
             "servtype" : "domain",
             "soa" : {
                "minimum_ttl" : "10m",
